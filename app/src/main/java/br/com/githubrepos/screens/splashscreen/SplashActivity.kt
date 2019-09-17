@@ -1,13 +1,11 @@
 package br.com.githubrepos.screens.splashscreen
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import br.com.githubrepos.R
+import br.com.githubrepos.screens.BaseActivity
+import br.com.githubrepos.screens.BaseUi
 
-class SplashActivity : AppCompatActivity() {
+interface SplashUi : BaseUi
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-    }
+class SplashActivity : BaseActivity<SplashPresenter>(), SplashUi {
+
+    override val layoutRes: Int? = null
 }

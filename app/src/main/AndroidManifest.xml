@@ -11,7 +11,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".screens.splashscreen.SplashActivity">
+        <activity
+            android:name=".screens.splashscreen.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Branded">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
