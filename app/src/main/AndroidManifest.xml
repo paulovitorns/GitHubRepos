@@ -10,18 +10,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".screens.splashscreen.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Branded">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -32,5 +29,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".screens.home.HomeActivity" />
+
     </application>
+
 </manifest>

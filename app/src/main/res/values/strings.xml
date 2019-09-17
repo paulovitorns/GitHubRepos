@@ -1,1 +1,11 @@
-<resources></resources>
+<resources>
+    <string name="search_hint">Digite uma linguagem para buscar</string>
+    <string name="menu_search">Busca</string>
+    <string name="offline_title">Hmmm, você esta offline!</string>
+    <string name="offline_description">Verifique sua conexão e tente novamente.</string>
+    <string name="check_connection">Recarregar</string>
+    <string name="all_items_loaded">Já exibimos todos os respositórios</string>
+    <string name="search_not_found_title">Hmm, foi mal!</string>
+    <string name="search_not_found_description">Não encontramos nenhum repositório para essa palavra-chave %s</string>
+    <string name="generic_error_message">Alguma coisa deu errado, por favor, verifique a sua palavra-chave usada na busca.</string>
+</resources>

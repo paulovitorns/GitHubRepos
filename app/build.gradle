@@ -8,6 +8,8 @@ plugins {
 
 apply from: '../config/version.gradle'
 apply from: '../config/lint.gradle'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 28

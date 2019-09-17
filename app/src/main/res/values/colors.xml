@@ -6,9 +6,5 @@
     <color name="olive_dark">#140f00</color>
     <color name="gray_opacity_90">#90aaaaaa</color>
     <color name="brown">#3b2c00</color>
-    <color name="green">#007F00</color>
     <color name="gray97">#f7f7f7</color>
-    <color name="gray">#eeeeee</color>
-    <color name="gray80">#cccccc</color>
-    <color name="gray40">#666666</color>
 </resources>
