@@ -3,7 +3,7 @@ package br.com.githubrepos.data.search
 import br.com.githubrepos.data.model.SearchRepositoriesResult
 import br.com.githubrepos.domain.search.SearchRepository
 import br.com.githubrepos.library.retrofit.endpoint.SearchRepositoriesEndpoint
-import io.reactivex.Single
+import io.reactivex.Observable
 import javax.inject.Inject
 
 class SearchGitHubRepositoriesRepository @Inject constructor(
@@ -16,7 +16,7 @@ class SearchGitHubRepositoriesRepository @Inject constructor(
         order: String,
         page: Int,
         perPage: Int
-    ): Single<SearchRepositoriesResult> {
+    ): Observable<SearchRepositoriesResult> {
         return searchRepositoriesEndpoint
             .searchRepositories(query, sort, order, page, perPage).map { response ->
                 when (response.code()) {

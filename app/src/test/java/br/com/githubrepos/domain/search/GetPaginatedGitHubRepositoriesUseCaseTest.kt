@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.given
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.willReturn
-import io.reactivex.Single
+import io.reactivex.Observable
 import org.junit.Test
 
 class GetPaginatedGitHubRepositoriesUseCaseTest {
@@ -37,7 +37,7 @@ class GetPaginatedGitHubRepositoriesUseCaseTest {
                 page = page,
                 perPage = perPage
             )
-        }.willReturn { Single.just(SearchRepositoriesResult(repositories = result)) }
+        }.willReturn { Observable.just(SearchRepositoriesResult(repositories = result)) }
 
         paginatedGitHubRepositories(query = query, sort = sort, order = order, page = page)
             .test()

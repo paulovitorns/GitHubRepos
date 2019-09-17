@@ -2,6 +2,7 @@ package br.com.githubrepos.library.retrofit
 
 import br.com.githubrepos.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -20,6 +21,7 @@ class RetrofitFactory @Inject constructor() {
      *
      * @return an implementation made by the Retrofit over the [clazz] interface
      */
+    @UnstableDefault
     fun <T> create(clazz: Class<T>, baseUrl: String): T {
         val httpClientBuilder = OkHttpClient.Builder()
 
@@ -34,7 +36,7 @@ class RetrofitFactory @Inject constructor() {
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(Json.asConverterFactory(contentType))
+            .addConverterFactory(Json.nonstrict.asConverterFactory(contentType))
             .client(httpClientBuilder.build())
             .build()
 

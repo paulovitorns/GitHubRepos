@@ -1,7 +1,7 @@
 package br.com.githubrepos.domain.search
 
 import br.com.githubrepos.data.model.SearchRepositoriesResult
-import io.reactivex.Single
+import io.reactivex.Observable
 
 interface SearchRepository {
     fun fetchRepositories(
@@ -10,5 +10,5 @@ interface SearchRepository {
         order: String,
         page: Int,
         perPage: Int
-    ): Single<SearchRepositoriesResult>
+    ): Observable<SearchRepositoriesResult>
 }

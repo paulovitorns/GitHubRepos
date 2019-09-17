@@ -36,7 +36,7 @@ interface HomeUi : BaseUi {
     fun retryButton(): Observable<Unit>
     fun showSearchResult(repositories: List<Repository>)
     fun showNextPage(repositories: List<Repository>)
-    fun searchError(queryString: String)
+    fun showSearchError(queryString: String)
     fun showAllItemsLoaded()
     fun showOfflineState()
     fun showDefaultError()
@@ -126,7 +126,7 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
         searchAdapter.addItems(repositories)
     }
 
-    override fun searchError(queryString: String) {
+    override fun showSearchError(queryString: String) {
         hideRecycler()
 
         val descriptionFormatted = notFoundDescription.text.toString().format(queryString)

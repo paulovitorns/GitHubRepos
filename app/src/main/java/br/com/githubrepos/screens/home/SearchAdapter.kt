@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.search_item.view.stars
 class SearchAdapter(
     private val context: Context,
     repositories: MutableList<Repository> = mutableListOf()
-) : SimpleAdapter<Repository, SearchAdapter.ViewHolder>() {
+) : SimpleAdapter<Repository, SearchAdapter.ViewHolder>(repositories) {
 
     override fun onCreateItemViewHolder(parent: ViewGroup): ViewHolder {
         val searchItemView = LayoutInflater.from(parent.context)
@@ -38,6 +38,7 @@ class SearchAdapter(
             if (item.owner.avatarUrl.isNotBlank()) {
                 Glide.with(context)
                     .load(item.owner.avatarUrl)
+                    .placeholder(R.drawable.github_mark)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .into(ownerImage)
             }
