@@ -1,6 +1,6 @@
 package br.com.githubrepos.domain.search
 
-import br.com.githubrepos.data.model.Item
+import br.com.githubrepos.data.model.Repository
 import br.com.githubrepos.library.reactivex.SchedulerProvider
 import br.com.githubrepos.library.reactivex.applySingleSchedulers
 import io.reactivex.Single
@@ -15,7 +15,7 @@ class GetGitHubRepositoriesByLanguage @Inject constructor(
         query: String = "kotlin",
         sort: String = "stars",
         order: String = "asc"
-    ): Single<List<Item>> {
+    ): Single<List<Repository>> {
 
         // Following the GitHub API rules.
         // This function will compound a query string for a specific
@@ -30,7 +30,7 @@ class GetGitHubRepositoriesByLanguage @Inject constructor(
             order = order,
             page = 1,
             perPage = 10).map {
-            it.items
+            it.repositories
         }.compose(applySingleSchedulers(schedulerProvider))
     }
 }

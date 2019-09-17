@@ -37,7 +37,7 @@ class GetGitHubRepositoriesByLanguageUseCaseTest {
                 page = page,
                 perPage = perPage
             )
-        }.willReturn { Single.just(SearchRepositoriesResult(items = result)) }
+        }.willReturn { Single.just(SearchRepositoriesResult(repositories = result)) }
 
         gitHubRepositoriesByLanguage(query = query, sort = sort, order = order)
             .test()

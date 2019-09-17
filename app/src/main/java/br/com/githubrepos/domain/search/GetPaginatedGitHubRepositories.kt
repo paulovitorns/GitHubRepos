@@ -1,6 +1,6 @@
 package br.com.githubrepos.domain.search
 
-import br.com.githubrepos.data.model.Item
+import br.com.githubrepos.data.model.Repository
 import br.com.githubrepos.library.reactivex.SchedulerProvider
 import br.com.githubrepos.library.reactivex.applySingleSchedulers
 import io.reactivex.Single
@@ -16,7 +16,7 @@ class GetPaginatedGitHubRepositories @Inject constructor(
         sort: String,
         order: String,
         page: Int
-    ): Single<List<Item>> {
+    ): Single<List<Repository>> {
 
         return searchRepository.fetchRepositories(
             query = query,
@@ -25,7 +25,7 @@ class GetPaginatedGitHubRepositories @Inject constructor(
             page = page,
             perPage = 10
         ).map {
-            it.items
+            it.repositories
         }.compose(applySingleSchedulers(schedulerProvider))
     }
 }

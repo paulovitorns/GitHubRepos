@@ -37,7 +37,7 @@ class GetPaginatedGitHubRepositoriesUseCaseTest {
                 page = page,
                 perPage = perPage
             )
-        }.willReturn { Single.just(SearchRepositoriesResult(items = result)) }
+        }.willReturn { Single.just(SearchRepositoriesResult(repositories = result)) }
 
         paginatedGitHubRepositories(query = query, sort = sort, order = order, page = page)
             .test()

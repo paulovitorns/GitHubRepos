@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.com.githubrepos">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".GitHubReposApplication"
         android:allowBackup="false"
@@ -29,7 +32,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".screens.home.HomeActivity" />
+        <activity
+            android:name=".screens.home.HomeActivity"
+            android:theme="@style/AppTheme.FullBackgroundColor.Orange" />
 
     </application>
 

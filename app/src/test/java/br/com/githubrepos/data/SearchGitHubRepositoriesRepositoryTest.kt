@@ -1,6 +1,6 @@
 package br.com.githubrepos.data
 
-import br.com.githubrepos.data.model.Item
+import br.com.githubrepos.data.model.Repository
 import br.com.githubrepos.data.model.SearchRepositoriesResult
 import br.com.githubrepos.data.search.ResultNotFoundException
 import br.com.githubrepos.data.search.SearchGitHubRepositoriesRepository
@@ -24,8 +24,8 @@ class SearchGitHubRepositoriesRepositoryTest {
     fun `success on fetch a GitHub repositories search`() {
         val mockedItem = mockedItem()
         val itemList = listOf(mockedItem, mockedItem)
-        val expected = SearchRepositoriesResult(items = itemList)
-        val result = SearchRepositoriesResult(items = itemList)
+        val expected = SearchRepositoriesResult(repositories = itemList)
+        val result = SearchRepositoriesResult(repositories = itemList)
 
         val query = "language:koltin"
         val sort = "stars"
@@ -49,8 +49,8 @@ class SearchGitHubRepositoriesRepositoryTest {
 
     @Test
     fun `get an empty result after load all pages of a GitHub repositories search pagination`() {
-        val itemList = emptyList<Item>()
-        val result = SearchRepositoriesResult(items = itemList)
+        val itemList = emptyList<Repository>()
+        val result = SearchRepositoriesResult(repositories = itemList)
 
         val query = "language:koltin"
         val sort = "stars"
@@ -66,7 +66,7 @@ class SearchGitHubRepositoriesRepositoryTest {
             .test()
             .assertNoErrors()
             .assertComplete()
-            .assertValue { it.items.isEmpty() }
+            .assertValue { it.repositories.isEmpty() }
             .awaitTerminalEvent()
 
         verify(searchEndpoint).searchRepositories(query, sort, order, page, perPage)

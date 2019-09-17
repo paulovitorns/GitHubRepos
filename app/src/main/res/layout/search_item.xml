@@ -52,7 +52,7 @@
 
         <TextView
             android:id="@+id/stars"
-            style="@style/Text.Title.Medium"
+            style="@style/Text.Body.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
@@ -60,7 +60,7 @@
             app:layout_constraintBottom_toBottomOf="@id/star"
             app:layout_constraintStart_toEndOf="@id/star"
             app:layout_constraintTop_toTopOf="@id/star"
-            tools:text="123" />
+            tools:text="1234567" />
 
         <ImageView
             android:id="@+id/fork"
@@ -75,7 +75,7 @@
 
         <TextView
             android:id="@+id/forks"
-            style="@style/Text.Title.Medium"
+            style="@style/Text.Body.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -84,16 +84,16 @@
             app:layout_constraintBottom_toBottomOf="@id/fork"
             app:layout_constraintStart_toEndOf="@id/fork"
             app:layout_constraintTop_toTopOf="@id/fork"
-            tools:text="321" />
+            tools:text="1234567" />
 
         <TextView
             android:id="@+id/ownerName"
             style="@style/Text.Title.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ownerImage"
             app:layout_constraintTop_toBottomOf="@id/stars"
