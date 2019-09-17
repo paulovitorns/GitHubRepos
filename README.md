@@ -43,9 +43,9 @@ Run Kotlin lint:
 Run Kotlin lint and apply automatic fixes:
 `./gradlew ktlintFormat`
 
-Using [RxLint](https://bitbucket.org/littlerobots/rxlint/src/default/) to make sure we'll our subscribers will 
-handle the `onError()` callback or it was added to some `CompositeDisposable` to avoid memory leaks
-and crash by not dispose the subscription correctly.
+Using [RxLint](https://bitbucket.org/littlerobots/rxlint/src/default/) to make sure our subscribers will 
+handle the `onError()` callback and it was added to the current `CompositeDisposable` to avoid memory leaks
+or crashes by not dispose the subscription correctly.
 
 ## Testing
 
