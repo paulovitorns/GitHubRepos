@@ -1,0 +1,29 @@
+ext {
+    major = 0
+    minor = 1
+    getVersionName = { "${major}.${minor}.${getVersionCode()}" }
+    getVersionCode = {
+        try {
+            def command = "git rev-list --count HEAD".execute()
+            command.waitFor()
+            String version = command.in?.text?.trim()
+
+            getLogger().debug("getVersionCode value: ${version}")
+            if (command.err?.text) {
+                getLogger().error("getVersionCode output error: ${command.err.text}")
+            }
+
+            assert !version?.isEmpty(): "It wasn't possible to get the version code"
+            return version.toBigInteger()
+
+        } catch (Throwable e) {
+            getLogger().error("getVersionCode error: ${e.message}")
+            return 1
+        }
+    }
+}
+
+task showVersion(type: DefaultTask) {
+    group = "help"
+    println "\nVERSION NAME: ${getVersionName()}\n"
+}

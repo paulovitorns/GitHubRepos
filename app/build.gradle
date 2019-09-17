@@ -5,14 +5,17 @@ plugins {
     id 'kotlin-kapt'
 }
 
+apply from: '../config/version.gradle'
+apply from: '../config/lint.gradle'
+
 android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "br.com.githubrepos"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode = getVersionCode()
+        versionName getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,6 +23,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -33,6 +40,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
+    // Dagger2
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
     implementation "com.google.dagger:dagger:$dagger_version"
     implementation "com.google.dagger:dagger-android:$dagger_version"
@@ -41,6 +49,16 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
+    testImplementation 'org.mockito:mockito-inline:2.8.47'
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+
+    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.1', {
+        exclude group: "com.android.support", module: "support-annotations"
+    })
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1', {
+        exclude group: "com.android.support", module: "support-annotations"
+    }
 }
