@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlinx-serialization'
     id 'kotlin-kapt'
 }
 
@@ -20,9 +21,39 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "environment"
+    productFlavors {
+        staging {
+            dimension "environment"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+            resValue "string", "app_name", "GitHubRepos S"
+        }
+        production {
+            dimension "environment"
+            applicationIdSuffix ".production"
+            versionNameSuffix "-production"
+            resValue "string", "app_name", "GitHubRepos P"
+        }
+    }
+    // https://kotlinlang.org/docs/tutorials/android-plugin.html
+    androidExtensions {
+        experimental = true
+    }
+    // Experimental, can cause false cache hits with certain annotation processors:
+    // https://blog.jetbrains.com/kotlin/2018/02/using-gradle-build-cache-with-kotlin/#comment-45400
+    kapt {
+        useBuildCache = true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
