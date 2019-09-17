@@ -4,6 +4,7 @@ import android.app.Application
 import br.com.githubrepos.GitHubReposApplication
 import br.com.githubrepos.library.di.modules.ActivityBindingModule
 import br.com.githubrepos.library.di.modules.GitHubReposModule
+import br.com.githubrepos.library.reactivex.di.ScheduleProviderModule
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -14,6 +15,7 @@ import javax.inject.Singleton
 @Component(
     modules = [
         GitHubReposModule::class,
+        ScheduleProviderModule::class,
         ActivityBindingModule::class,
         AndroidSupportInjectionModule::class
     ]

@@ -16,41 +16,29 @@ abstract class BaseActivity<T : BasePresenter<BaseUi>> : DaggerAppCompatActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         layoutRes?.let { setContentView(it) }
+        setupToolbar()
         setupViews()
         presenter.setUi(this)
         presenter.onCreate()
     }
 
-    open fun setupViews() {}
+    open fun setupToolbar() {}
 
-    override fun onStart() {
-        super.onStart()
-        presenter.onStart()
-    }
+    open fun setupViews() {}
 
     override fun onRestart() {
         super.onRestart()
         presenter.setUi(this)
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.onPause()
-    }
-
-    override fun onStop() {
-        presenter.onStop()
-        super.onStop()
-    }
-
     override fun onDestroy() {
         presenter.onDestroy()
         super.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        presenter.onSaveState()
+        super.onSaveInstanceState(outState)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
