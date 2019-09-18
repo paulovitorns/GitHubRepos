@@ -6,6 +6,7 @@ import br.com.githubrepos.domain.search.GetGitHubRepositoriesByLanguage
 import br.com.githubrepos.domain.search.GetPaginatedGitHubRepositories
 import br.com.githubrepos.library.reactivex.SchedulerProvider
 import br.com.githubrepos.library.reactivex.addDisposableTo
+import br.com.githubrepos.library.state.StateStore
 import br.com.githubrepos.screens.BasePresenter
 import br.com.githubrepos.screens.BaseUi
 import io.reactivex.Observable
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class HomePresenter @Inject constructor(
     private val getGitHubRepositoriesByLanguage: GetGitHubRepositoriesByLanguage,
     private val getPaginatedGitHubRepositories: GetPaginatedGitHubRepositories,
-    private val schedulerProvider: SchedulerProvider
+    private val schedulerProvider: SchedulerProvider,
+    private val stateStore: StateStore
 ) : BasePresenter<BaseUi>() {
 
     private val homeUi: HomeUi? get() = baseUi()
@@ -32,8 +34,27 @@ class HomePresenter @Inject constructor(
     override fun onCreate() {
         super.onCreate()
         homeUi?.showDefaultQueryString(searchViewState.lastQueryString)
-        loadDefaultQuery()
+        restoreStateOrLoadDefaultQuery()
         bindIntents()
+    }
+
+    override fun onSaveState() {
+        super.onSaveState()
+        stateStore.save(HomeUi::class, searchViewState)
+    }
+
+    private fun restoreStateOrLoadDefaultQuery() {
+        val savedState = stateStore.load<SearchViewState>(HomeUi::class)
+        savedState?.let { restoreLastState(it) } ?: loadDefaultQuery()
+    }
+
+    private fun restoreLastState(lastState: SearchViewState) {
+        searchViewState = lastState
+        if (lastState.stateError != null) {
+            handleError(lastState.stateError)
+        } else {
+            handleFirstPageResult(lastState.searchResult)
+        }
     }
 
     private fun loadDefaultQuery() {
@@ -114,9 +135,13 @@ class HomePresenter @Inject constructor(
 
         if (repositories.isEmpty()) {
             homeUi?.showSearchError(searchViewState.lastQueryString)
+            searchViewState = SearchViewState.Builder(searchViewState)
+                .setLoadedAllPages(true)
+                .build()
         } else {
             searchViewState = SearchViewState.Builder(searchViewState)
                 .setSearchResult(repositories)
+                .setLoadedAllPages(false)
                 .setStateError(null)
                 .build()
 
@@ -140,6 +165,7 @@ class HomePresenter @Inject constructor(
 
             searchViewState = SearchViewState.Builder(searchViewState)
                 .setSearchResult(newData)
+                .setLoadedAllPages(false)
                 .setStateError(null)
                 .build()
 
