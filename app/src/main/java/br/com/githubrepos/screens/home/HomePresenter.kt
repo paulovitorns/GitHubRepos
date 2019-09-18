@@ -8,6 +8,7 @@ import br.com.githubrepos.library.reactivex.SchedulerProvider
 import br.com.githubrepos.library.reactivex.addDisposableTo
 import br.com.githubrepos.screens.BasePresenter
 import br.com.githubrepos.screens.BaseUi
+import io.reactivex.Observable
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -36,11 +37,7 @@ class HomePresenter @Inject constructor(
     }
 
     private fun loadDefaultQuery() {
-        getGitHubRepositoriesByLanguage(
-            query = searchViewState.lastQueryString,
-            sort = searchViewState.sort,
-            order = searchViewState.order
-        ).subscribe(
+        fetchRepositories().subscribe(
             { handleFirstPageResult(it) },
             { handleError(it) }
         ).addDisposableTo(disposeBag)
@@ -51,43 +48,70 @@ class HomePresenter @Inject constructor(
             .debounce(1, TimeUnit.SECONDS, schedulerProvider.postWorkerThread())
             .filter { it.trim().isNotEmpty() }
             .filter { typed -> typed != searchViewState.lastQueryString }
-            .flatMap { queryString ->
+            .switchMap { queryString ->
                 homeUi?.showProgress()
 
                 searchViewState = SearchViewState.Builder(searchViewState)
                     .setLastQueryString(queryString)
                     .build()
 
-                getGitHubRepositoriesByLanguage(
-                    query = searchViewState.lastQueryString,
-                    sort = searchViewState.sort,
-                    order = searchViewState.order
-                )
+                fetchRepositories()
             }
             .subscribe({ handleFirstPageResult(it) }, { handleError(it) })
             .addDisposableTo(disposeBag)
 
         homeUi?.loadNextPage()!!
             .filter { !searchViewState.hasLoadedAllPages }
-            .flatMap {
+            .switchMap {
                 homeUi?.showProgress()
 
                 searchViewState = SearchViewState.Builder(searchViewState)
                     .increaseCurrentPage()
                     .build()
 
-                getPaginatedGitHubRepositories(
-                    query = searchViewState.lastQueryString,
-                    sort = searchViewState.sort,
-                    order = searchViewState.order,
-                    page = searchViewState.currentPage
-                )
+                paginateSearchResult()
             }
             .subscribe({ handlePaginatedResult(it) }, { handleError(it) })
             .addDisposableTo(disposeBag)
+
+        homeUi?.retryButton()!!
+            .filter { searchViewState.stateError is UnknownHostException }
+            .switchMap {
+                homeUi?.showProgress()
+                when {
+                    searchViewState.currentPage == 1 -> fetchRepositories()
+                    else -> paginateSearchResult()
+                }
+            }.subscribe({
+                when {
+                    searchViewState.currentPage == 1 -> handleFirstPageResult(it)
+                    else -> handlePaginatedResult(it)
+                }
+            }, {
+                handleError(it)
+            }).addDisposableTo(disposeBag)
+    }
+
+    private fun fetchRepositories(): Observable<List<Repository>> {
+        return getGitHubRepositoriesByLanguage(
+            query = searchViewState.lastQueryString,
+            sort = searchViewState.sort,
+            order = searchViewState.order
+        )
+    }
+
+    private fun paginateSearchResult(): Observable<List<Repository>> {
+        return getPaginatedGitHubRepositories(
+            query = searchViewState.lastQueryString,
+            sort = searchViewState.sort,
+            order = searchViewState.order,
+            page = searchViewState.currentPage
+        )
     }
 
     private fun handleFirstPageResult(repositories: List<Repository>) {
+        homeUi?.hideAllErrorState()
+
         if (repositories.isEmpty()) {
             homeUi?.showSearchError(searchViewState.lastQueryString)
         } else {
@@ -102,6 +126,8 @@ class HomePresenter @Inject constructor(
     }
 
     private fun handlePaginatedResult(repositories: List<Repository>) {
+        homeUi?.hideAllErrorState()
+
         if (repositories.isEmpty()) {
             homeUi?.showAllItemsLoaded()
 

@@ -113,7 +113,7 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
     }
 
     override fun showSearchResult(repositories: List<Repository>) {
-        recyclerView.isVisible = true
+        showRecyclerIfNeeded()
         searchAdapter.setItems(repositories)
 
         if (lastRecyclerPosition > 0) {
@@ -123,7 +123,12 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
     }
 
     override fun showNextPage(repositories: List<Repository>) {
+        showRecyclerIfNeeded()
         searchAdapter.addItems(repositories)
+    }
+
+    private fun showRecyclerIfNeeded() {
+        if (!recyclerView.isVisible) recyclerView.isVisible = true
     }
 
     override fun showSearchError(queryString: String) {
