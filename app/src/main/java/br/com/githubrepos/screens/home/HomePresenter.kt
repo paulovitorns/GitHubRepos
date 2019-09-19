@@ -1,5 +1,6 @@
 package br.com.githubrepos.screens.home
 
+import android.util.Log
 import br.com.githubrepos.data.model.Repository
 import br.com.githubrepos.data.search.ResultNotFoundException
 import br.com.githubrepos.domain.search.GetGitHubRepositoriesByLanguage
@@ -69,21 +70,22 @@ class HomePresenter @Inject constructor(
             .debounce(1, TimeUnit.SECONDS, schedulerProvider.postWorkerThread())
             .filter { it.trim().isNotEmpty() }
             .filter { typed -> typed != searchViewState.lastQueryString }
-            .switchMap { queryString ->
+            .subscribe({ queryString ->
                 homeUi?.showProgress()
-
                 searchViewState = SearchViewState.Builder(searchViewState)
                     .setLastQueryString(queryString)
                     .build()
 
-                fetchRepositories()
-            }
-            .subscribe({ handleFirstPageResult(it) }, { handleError(it) })
-            .addDisposableTo(disposeBag)
+                fetchRepositories().subscribe({
+                    handleFirstPageResult(it)
+                }, {
+                    handleError(it)
+                }).addDisposableTo(disposeBag)
+            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
 
         homeUi?.loadNextPage()!!
             .filter { !searchViewState.hasLoadedAllPages }
-            .switchMap {
+            .subscribe({
                 homeUi?.showProgress()
 
                 searchViewState = SearchViewState.Builder(searchViewState)
@@ -91,26 +93,29 @@ class HomePresenter @Inject constructor(
                     .build()
 
                 paginateSearchResult()
-            }
-            .subscribe({ handlePaginatedResult(it) }, { handleError(it) })
-            .addDisposableTo(disposeBag)
+                    .subscribe({
+                        handlePaginatedResult(it)
+                    }, {
+                        handleError(it)
+                    }).addDisposableTo(disposeBag)
+            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
 
         homeUi?.retryButton()!!
             .filter { searchViewState.stateError is UnknownHostException }
-            .switchMap {
+            .subscribe({
                 homeUi?.showProgress()
                 when {
                     searchViewState.currentPage == 1 -> fetchRepositories()
                     else -> paginateSearchResult()
-                }
-            }.subscribe({
-                when {
-                    searchViewState.currentPage == 1 -> handleFirstPageResult(it)
-                    else -> handlePaginatedResult(it)
-                }
-            }, {
-                handleError(it)
-            }).addDisposableTo(disposeBag)
+                }.subscribe({
+                    when {
+                        searchViewState.currentPage == 1 -> handleFirstPageResult(it)
+                        else -> handlePaginatedResult(it)
+                    }
+                }, {
+                    handleError(it)
+                }).addDisposableTo(disposeBag)
+            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
     }
 
     private fun fetchRepositories(): Observable<List<Repository>> {

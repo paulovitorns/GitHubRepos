@@ -24,6 +24,7 @@ class SearchGitHubRepositoriesRepository @Inject constructor(
                         val responseBody = response.body()
                         responseBody ?: throw ResultNotFoundException(query)
                     }
+                    422 -> throw ResultNotFoundException(query)
                     else -> throw IllegalArgumentException(response.errorBody().toString())
                 }
             }
