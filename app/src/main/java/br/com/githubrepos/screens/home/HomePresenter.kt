@@ -116,6 +116,11 @@ class HomePresenter @Inject constructor(
                     handleError(it)
                 }).addDisposableTo(disposeBag)
             }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
+
+        homeUi?.repositorySelected()!!
+            .subscribe({ repository ->
+                homeUi?.openRepositoryWebPage(repository.htmlUrl)
+            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
     }
 
     private fun fetchRepositories(): Observable<List<Repository>> {

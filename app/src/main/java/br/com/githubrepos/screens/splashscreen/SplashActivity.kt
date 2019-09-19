@@ -15,6 +15,7 @@ class SplashActivity : BaseActivity<SplashPresenter>(), SplashUi {
     override fun openHomeScreen() {
         Intent(this, HomeActivity::class.java).also {
             startActivity(it)
+            finish()
         }
     }
 }

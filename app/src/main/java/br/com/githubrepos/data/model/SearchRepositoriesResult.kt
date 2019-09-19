@@ -28,6 +28,8 @@ data class Repository(
     val stargazersCount: Long = 0,
     @SerialName("watchers_count")
     val watchersCount: Long = 0,
+    @SerialName("html_url")
+    val htmlUrl: String = "",
     val owner: Owner
 )
 

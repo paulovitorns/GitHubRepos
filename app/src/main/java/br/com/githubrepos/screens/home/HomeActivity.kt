@@ -1,6 +1,8 @@
 package br.com.githubrepos.screens.home
 
+import android.content.Intent
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -36,11 +38,13 @@ interface HomeUi : BaseUi {
     fun retryButton(): Observable<Unit>
     fun showSearchResult(repositories: List<Repository>)
     fun showNextPage(repositories: List<Repository>)
+    fun repositorySelected(): Observable<Repository>
     fun showSearchError(queryString: String)
     fun showAllItemsLoaded()
     fun showOfflineState()
     fun showDefaultError()
     fun hideAllErrorState()
+    fun openRepositoryWebPage(url: String)
 }
 
 class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
@@ -131,6 +135,10 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
         if (!recyclerView.isVisible) recyclerView.isVisible = true
     }
 
+    override fun repositorySelected(): Observable<Repository> {
+        return searchAdapter.onItemSelected()
+    }
+
     override fun showSearchError(queryString: String) {
         hideRecycler()
 
@@ -170,6 +178,12 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
         searchNotFound.isVisible = false
         defaultError.isVisible = false
         hideOfflineState()
+    }
+
+    override fun openRepositoryWebPage(url: String) {
+        Intent(Intent.ACTION_VIEW, Uri.parse(url)).also {
+            startActivity(it)
+        }
     }
 
     private fun hideRecycler() {
