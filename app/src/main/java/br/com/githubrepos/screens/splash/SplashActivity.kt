@@ -1,4 +1,4 @@
-package br.com.githubrepos.screens.splashscreen
+package br.com.githubrepos.screens.splash
 
 import android.content.Intent
 import br.com.githubrepos.screens.BaseActivity

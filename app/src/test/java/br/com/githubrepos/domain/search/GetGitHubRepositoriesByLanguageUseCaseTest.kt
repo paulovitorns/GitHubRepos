@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.given
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.willReturn
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Test
 
 class GetGitHubRepositoriesByLanguageUseCaseTest {
@@ -37,7 +37,7 @@ class GetGitHubRepositoriesByLanguageUseCaseTest {
                 page = page,
                 perPage = perPage
             )
-        }.willReturn { Observable.just(SearchRepositoriesResult(repositories = result)) }
+        }.willReturn { Single.just(SearchRepositoriesResult(repositories = result)) }
 
         gitHubRepositoriesByLanguage(query = query, sort = sort, order = order)
             .test()

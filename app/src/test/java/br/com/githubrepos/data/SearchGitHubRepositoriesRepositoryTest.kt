@@ -10,7 +10,7 @@ import com.nhaarman.mockitokotlin2.given
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.willReturn
-import io.reactivex.Observable
+import io.reactivex.Single
 import okhttp3.ResponseBody
 import org.junit.Test
 import retrofit2.Response
@@ -35,7 +35,7 @@ class SearchGitHubRepositoriesRepositoryTest {
 
         given {
             searchEndpoint.searchRepositories(query, sort, order, page, perPage)
-        }.willReturn { Observable.just(Response.success(200, result)) }
+        }.willReturn { Single.just(Response.success(200, result)) }
 
         searchGitHubRepositories.fetchRepositories(query, sort, order, page, perPage)
             .test()
@@ -60,7 +60,7 @@ class SearchGitHubRepositoriesRepositoryTest {
 
         given {
             searchEndpoint.searchRepositories(query, sort, order, page, perPage)
-        }.willReturn { Observable.just(Response.success(200, result)) }
+        }.willReturn { Single.just(Response.success(200, result)) }
 
         searchGitHubRepositories.fetchRepositories(query, sort, order, page, perPage)
             .test()
@@ -83,7 +83,7 @@ class SearchGitHubRepositoriesRepositoryTest {
         given {
             searchEndpoint.searchRepositories(query, sort, order, page, perPage)
         }.willReturn {
-            Observable.just(
+            Single.just(
                 Response.error(
                     500,
                     ResponseBody.create(null, "")
@@ -110,7 +110,7 @@ class SearchGitHubRepositoriesRepositoryTest {
         given {
             searchEndpoint.searchRepositories(query, sort, order, page, perPage)
         }.willReturn {
-            Observable.just(Response.success(null as SearchRepositoriesResult?))
+            Single.just(Response.success(null as SearchRepositoriesResult?))
         }
 
         searchGitHubRepositories.fetchRepositories(query, sort, order, page, perPage)

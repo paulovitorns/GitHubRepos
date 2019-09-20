@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".screens.splashscreen.SplashActivity"
+            android:name=".screens.splash.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Branded">
             <intent-filter>

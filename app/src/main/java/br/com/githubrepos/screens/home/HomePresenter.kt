@@ -1,6 +1,6 @@
 package br.com.githubrepos.screens.home
 
-import android.util.Log
+import androidx.annotation.VisibleForTesting
 import br.com.githubrepos.data.model.Repository
 import br.com.githubrepos.data.search.ResultNotFoundException
 import br.com.githubrepos.domain.search.GetGitHubRepositoriesByLanguage
@@ -10,7 +10,7 @@ import br.com.githubrepos.library.reactivex.addDisposableTo
 import br.com.githubrepos.library.state.StateStore
 import br.com.githubrepos.screens.BasePresenter
 import br.com.githubrepos.screens.BaseUi
-import io.reactivex.Observable
+import io.reactivex.Single
 import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -24,7 +24,8 @@ class HomePresenter @Inject constructor(
 
     private val homeUi: HomeUi? get() = baseUi()
 
-    private var searchViewState = SearchViewState
+    @VisibleForTesting
+    var searchViewState = SearchViewState
         .Builder(SearchViewState())
         .setLastQueryString("kotlin")
         .increaseCurrentPage()
@@ -44,6 +45,46 @@ class HomePresenter @Inject constructor(
         stateStore.save(HomeUi::class, searchViewState)
     }
 
+    fun retryAction() {
+
+        if (searchViewState.stateError !is UnknownHostException) return
+
+        homeUi?.showProgress()
+
+        when {
+            searchViewState.currentPage == 1 -> fetchRepositories()
+            else -> paginateSearchResult()
+        }.subscribe({
+            when {
+                searchViewState.currentPage == 1 -> handleFirstPageResult(it)
+                else -> handlePaginatedResult(it)
+            }
+        }, {
+            handleError(it)
+        }).addDisposableTo(disposeBag)
+    }
+
+    fun loadNextPage() {
+        if (searchViewState.hasLoadedAllPages) return
+
+        homeUi?.showProgress()
+
+        searchViewState = SearchViewState.Builder(searchViewState)
+            .increaseCurrentPage()
+            .build()
+
+        paginateSearchResult()
+            .subscribe({
+                handlePaginatedResult(it)
+            }, {
+                handleError(it)
+            }).addDisposableTo(disposeBag)
+    }
+
+    fun onRepositorySelected(repository: Repository) {
+        homeUi?.openRepositoryWebPage(repository.htmlUrl)
+    }
+
     private fun restoreStateOrLoadDefaultQuery() {
         val savedState = stateStore.load<SearchViewState>(HomeUi::class)
         savedState?.let { restoreLastState(it) } ?: loadDefaultQuery()
@@ -59,6 +100,7 @@ class HomePresenter @Inject constructor(
     }
 
     private fun loadDefaultQuery() {
+        homeUi?.showProgress()
         fetchRepositories().subscribe(
             { handleFirstPageResult(it) },
             { handleError(it) }
@@ -81,49 +123,10 @@ class HomePresenter @Inject constructor(
                 }, {
                     handleError(it)
                 }).addDisposableTo(disposeBag)
-            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
-
-        homeUi?.loadNextPage()!!
-            .filter { !searchViewState.hasLoadedAllPages }
-            .subscribe({
-                homeUi?.showProgress()
-
-                searchViewState = SearchViewState.Builder(searchViewState)
-                    .increaseCurrentPage()
-                    .build()
-
-                paginateSearchResult()
-                    .subscribe({
-                        handlePaginatedResult(it)
-                    }, {
-                        handleError(it)
-                    }).addDisposableTo(disposeBag)
-            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
-
-        homeUi?.retryButton()!!
-            .filter { searchViewState.stateError is UnknownHostException }
-            .subscribe({
-                homeUi?.showProgress()
-                when {
-                    searchViewState.currentPage == 1 -> fetchRepositories()
-                    else -> paginateSearchResult()
-                }.subscribe({
-                    when {
-                        searchViewState.currentPage == 1 -> handleFirstPageResult(it)
-                        else -> handlePaginatedResult(it)
-                    }
-                }, {
-                    handleError(it)
-                }).addDisposableTo(disposeBag)
-            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
-
-        homeUi?.repositorySelected()!!
-            .subscribe({ repository ->
-                homeUi?.openRepositoryWebPage(repository.htmlUrl)
-            }, { Log.e("Search", it.message) }).addDisposableTo(disposeBag)
+            }, { }).addDisposableTo(disposeBag)
     }
 
-    private fun fetchRepositories(): Observable<List<Repository>> {
+    private fun fetchRepositories(): Single<List<Repository>> {
         return getGitHubRepositoriesByLanguage(
             query = searchViewState.lastQueryString,
             sort = searchViewState.sort,
@@ -131,7 +134,7 @@ class HomePresenter @Inject constructor(
         )
     }
 
-    private fun paginateSearchResult(): Observable<List<Repository>> {
+    private fun paginateSearchResult(): Single<List<Repository>> {
         return getPaginatedGitHubRepositories(
             query = searchViewState.lastQueryString,
             sort = searchViewState.sort,

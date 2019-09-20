@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.given
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.willReturn
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Test
 
 class GetPaginatedGitHubRepositoriesUseCaseTest {
@@ -23,7 +23,7 @@ class GetPaginatedGitHubRepositoriesUseCaseTest {
         val expected = listOf(mockedItem, mockedItem)
         val result = listOf(mockedItem, mockedItem)
 
-        val query = "language:koltin"
+        val query = "koltin"
         val sort = "stars"
         val order = "asc"
         val page = 2
@@ -31,13 +31,13 @@ class GetPaginatedGitHubRepositoriesUseCaseTest {
 
         given {
             searchGitHubRepositories.fetchRepositories(
-                query = query,
+                query = "language:$query",
                 sort = sort,
                 order = order,
                 page = page,
                 perPage = perPage
             )
-        }.willReturn { Observable.just(SearchRepositoriesResult(repositories = result)) }
+        }.willReturn { Single.just(SearchRepositoriesResult(repositories = result)) }
 
         paginatedGitHubRepositories(query = query, sort = sort, order = order, page = page)
             .test()
@@ -47,7 +47,7 @@ class GetPaginatedGitHubRepositoriesUseCaseTest {
             .awaitTerminalEvent()
 
         verify(searchGitHubRepositories).fetchRepositories(
-            query = query,
+            query = "language:$query",
             sort = sort,
             order = order,
             page = page,

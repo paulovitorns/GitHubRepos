@@ -16,8 +16,6 @@ import br.com.githubrepos.library.extension.hideKeyboard
 import br.com.githubrepos.library.extension.toast
 import br.com.githubrepos.screens.BaseActivity
 import br.com.githubrepos.screens.BaseUi
-import com.jakewharton.rxbinding3.recyclerview.scrollStateChanges
-import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.queryTextChanges
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_home.defaultError
@@ -27,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_home.recyclerView
 import kotlinx.android.synthetic.main.activity_home.searchNotFound
 import kotlinx.android.synthetic.main.activity_home.searchView
 import kotlinx.android.synthetic.main.offline_state.retryButton
+import kotlinx.android.synthetic.main.search_item.repository
 import kotlinx.android.synthetic.main.search_not_found_state.notFoundDescription
 
 interface HomeUi : BaseUi {
@@ -34,11 +33,8 @@ interface HomeUi : BaseUi {
     fun showProgress()
     fun hideProgress()
     fun search(): Observable<String>
-    fun loadNextPage(): Observable<Boolean>
-    fun retryButton(): Observable<Unit>
     fun showSearchResult(repositories: List<Repository>)
     fun showNextPage(repositories: List<Repository>)
-    fun repositorySelected(): Observable<Repository>
     fun showSearchError(queryString: String)
     fun showAllItemsLoaded()
     fun showOfflineState()
@@ -64,6 +60,12 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
     override fun setupViews() {
         super.setupViews()
 
+        searchAdapter.apply {
+            onItemClicked = { repository ->
+                presenter.onRepositorySelected(repository)
+            }
+        }
+
         with(recyclerView) {
             layoutManager = linearLayoutManager
             adapter = searchAdapter
@@ -76,8 +78,17 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
                     hideKeyboard()
                     searchView.clearFocus()
                 }
+
+                val layoutManager = (recyclerView.layoutManager as LinearLayoutManager)
+                val lastVisibleItemPosition = layoutManager.findLastCompletelyVisibleItemPosition()
+
+                if (lastVisibleItemPosition == searchAdapter.itemCount - 1) {
+                    presenter.loadNextPage()
+                }
             }
         })
+
+        retryButton.setOnClickListener { presenter.retryAction() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -104,18 +115,6 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
             .map { it.toString() }
     }
 
-    override fun loadNextPage(): Observable<Boolean> {
-        return recyclerView.scrollStateChanges()
-            .filter { event -> event == RecyclerView.SCROLL_STATE_IDLE }
-            .filter {
-                linearLayoutManager.findLastCompletelyVisibleItemPosition() == searchAdapter.itemCount - 1
-            }.map { true }
-    }
-
-    override fun retryButton(): Observable<Unit> {
-        return retryButton.clicks()
-    }
-
     override fun showSearchResult(repositories: List<Repository>) {
         showRecyclerIfNeeded()
         searchAdapter.setItems(repositories)
@@ -133,10 +132,6 @@ class HomeActivity : BaseActivity<HomePresenter>(), HomeUi {
 
     private fun showRecyclerIfNeeded() {
         if (!recyclerView.isVisible) recyclerView.isVisible = true
-    }
-
-    override fun repositorySelected(): Observable<Repository> {
-        return searchAdapter.onItemSelected()
     }
 
     override fun showSearchError(queryString: String) {

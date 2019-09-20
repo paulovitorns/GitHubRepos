@@ -5,19 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import br.com.githubrepos.data.model.Repository
-import com.jakewharton.rxbinding3.view.clicks
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 
 abstract class SimpleAdapter<I, VH : ViewHolder>(
     private val itemList: MutableList<I> = mutableListOf()
 ) : Adapter<ViewHolder>() {
 
-    private val itemClickedSubject: PublishSubject<I> = PublishSubject.create()
+    var onItemClicked: ((item: I) -> Unit)? = null
 
     override fun getItemCount(): Int = itemList.size
 
@@ -33,16 +29,11 @@ abstract class SimpleAdapter<I, VH : ViewHolder>(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val childItem = itemList[position]
 
-        holder.itemView.clicks()
-            .map { childItem }
-            .subscribe(itemClickedSubject)
+        holder.itemView.setOnClickListener {
+            onItemClicked?.invoke(childItem)
+        }
 
         onBindViewHolder(holder as VH, position, childItem)
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        itemClickedSubject.onComplete()
     }
 
     protected fun inflateView(
@@ -52,10 +43,6 @@ abstract class SimpleAdapter<I, VH : ViewHolder>(
     ): View {
         val inflater = LayoutInflater.from(rootView.context)
         return inflater.inflate(layoutResource, rootView, attachToRoot)
-    }
-
-    open fun onItemSelected(): Observable<I> {
-        return itemClickedSubject.map { it }
     }
 
     open fun setItems(newItems: List<I>) {

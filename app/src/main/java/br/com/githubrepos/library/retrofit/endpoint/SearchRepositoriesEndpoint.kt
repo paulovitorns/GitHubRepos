@@ -1,7 +1,7 @@
 package br.com.githubrepos.library.retrofit.endpoint
 
 import br.com.githubrepos.data.model.SearchRepositoriesResult
-import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -15,5 +15,5 @@ interface SearchRepositoriesEndpoint {
         @Query("order") order: String,
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
-    ): Observable<Response<SearchRepositoriesResult>>
+    ): Single<Response<SearchRepositoriesResult>>
 }

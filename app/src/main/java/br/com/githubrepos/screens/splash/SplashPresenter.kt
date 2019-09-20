@@ -1,4 +1,4 @@
-package br.com.githubrepos.screens.splashscreen
+package br.com.githubrepos.screens.splash
 
 import br.com.githubrepos.library.di.ActivityScope
 import br.com.githubrepos.library.reactivex.SchedulerProvider
